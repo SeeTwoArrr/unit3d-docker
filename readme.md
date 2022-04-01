@@ -2,7 +2,7 @@
 
 To start, clone the repository and run `docker-compose up -d`.
 
-# Customization
+## Customization
 The included [`.env`](.env) file can be used for some customization.
 
 
