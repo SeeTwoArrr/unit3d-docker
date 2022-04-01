@@ -1,0 +1,29 @@
+---
+version: "3"
+
+services:
+  unit3d:
+    image: seetwoarr/unit3d:latest
+    networks:
+      - unit3d
+    build:
+      context: ./unit3d
+      dockerfile: Dockerfile
+      args:
+        - "php_fpm_version=${php_fpm_version}"
+        - "unit3d_version=${unit3d_version}"
+        - "fpm_healthcheck_version=${fpm_healthcheck_version}"
+  proxy:
+    image: seetwoarr/nginx:latest
+    ports:
+      - "${proxy_listen_address}:80"
+    networks:
+      - unit3d
+    build:
+      context: ./proxy
+      dockerfile: Dockerfile
+      args:
+        - "nginx_version=${nginx_version}"
+
+networks:
+  unit3d:

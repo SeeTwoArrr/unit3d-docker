@@ -1,10 +1,13 @@
 # syntax=docker/dockerfile:1
 
-FROM php:8.1-fpm-bullseye
+ARG php_fpm_version
 ARG unit3d_version
 ARG fpm_healthcheck_version
-ENV UNIT3D_VERSION=${unit3d_version:6.0.3}
-ENV FPM_HEALTHCHECK_VERSION=${fpm_healthcheck_version:0.5.0}
+
+FROM php:${php_fpm_version}
+
+ENV UNIT3D_VERSION="${unit3d_version}"
+ENV FPM_HEALTHCHECK_VERSION="${fpm_healthcheck_version}"
 
 WORKDIR /var/www
 
@@ -15,6 +18,7 @@ RUN apt-get update \
     && docker-php-ext-install -j$(nproc) gd intl bcmath \
     && docker-php-ext-enable gd redis intl bcmath \
     && rm -r /var/www/html \
+    && printf "\n\n\n\n\n\nURL: https://github.com/HDInnovations/UNIT3D-Community-Edition/archive/refs/tags/v$UNIT3D_VERSION.tar.gz\n\n\n\n\n" \
     && curl -Lo unit3d.tgz "https://github.com/HDInnovations/UNIT3D-Community-Edition/archive/refs/tags/v$UNIT3D_VERSION.tar.gz" \
     && tar -xzf unit3d.tgz \
     && rm unit3d.tgz \
@@ -30,10 +34,10 @@ RUN apt-get update \
 # https://github.com/renatomefi/php-fpm-healthcheck
 # Perform a healthcheck every 10 seconds, for each one, fpm has 5 seconds to respond.
 # After 6 consecutive failures (1 minute of being unresponsive/too slow) the container becomes unhealthy.
-HEALTHCHECK --interval=10 --timeout=5 --starts-period=10 --retries=6 \
+HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=6 \
     CMD /usr/bin/php-fpm-healthcheck
 
 VOLUME /var/www/unit3d
 VOLUME /usr/local/etc/php/conf.d
 
-ENTRYPOINT ['docker-php-entrypoint']
+EXPOSE 9000/tcp
