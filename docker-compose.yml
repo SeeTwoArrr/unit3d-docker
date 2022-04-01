@@ -3,7 +3,7 @@ version: "3"
 
 services:
   unit3d:
-    image: seetwoarr/unit3d:latest
+    image: seetwoarrr/unit3d:latest
     networks:
       - unit3d
     build:
@@ -14,7 +14,7 @@ services:
         - "unit3d_version=${unit3d_version}"
         - "fpm_healthcheck_version=${fpm_healthcheck_version}"
   proxy:
-    image: seetwoarr/nginx:latest
+    image: seetwoarrr/nginx:latest
     ports:
       - "${proxy_listen_address}:80"
     networks:
