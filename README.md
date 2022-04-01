@@ -16,4 +16,4 @@ The included [`.env`](.env) file can be used for some customization.
 
 ## TODO
 * Create configuration for proxy
-* ...
+* Create separate Redis server
