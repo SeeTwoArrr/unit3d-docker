@@ -1,13 +1,13 @@
 # syntax=docker/dockerfile:1
 
-ARG php_fpm_version
-ARG unit3d_version
-ARG fpm_healthcheck_version
+ARG PHP_FPM_VERSION
 
-FROM php:${php_fpm_version}
+FROM php:${PHP_FPM_VERSION}
 
-ENV UNIT3D_VERSION="${unit3d_version}"
-ENV FPM_HEALTHCHECK_VERSION="${fpm_healthcheck_version}"
+ARG UNIT3D_VERSION
+ARG FPM_HEALTHCHECK_VERSION
+ENV UNIT3D_VERSION=${UNIT3D_VERSION}
+ENV FPM_HEALTHCHECK_VERSION=${FPM_HEALTHCHECK_VERSION}
 
 WORKDIR /var/www
 
@@ -18,16 +18,16 @@ RUN apt-get update \
     && docker-php-ext-install -j$(nproc) gd intl bcmath \
     && docker-php-ext-enable gd redis intl bcmath \
     && rm -r /var/www/html \
-    && printf "\n\n\n\n\n\nURL: https://github.com/HDInnovations/UNIT3D-Community-Edition/archive/refs/tags/v$UNIT3D_VERSION.tar.gz\n\n\n\n\n" \
-    && curl -Lo unit3d.tgz "https://github.com/HDInnovations/UNIT3D-Community-Edition/archive/refs/tags/v$UNIT3D_VERSION.tar.gz" \
+    && printf "\n\n\n\n\n\nURL: https://github.com/HDInnovations/UNIT3D-Community-Edition/archive/refs/tags/v${UNIT3D_VERSION}.tar.gz\n\n\n\n\n" \
+    && curl -Lo unit3d.tgz "https://github.com/HDInnovations/UNIT3D-Community-Edition/archive/refs/tags/v${UNIT3D_VERSION}.tar.gz" \
     && tar -xzf unit3d.tgz \
     && rm unit3d.tgz \
-    && mv "UNIT3D-Community-Edition-$UNIT3D_VERSION" unit3d \
-    && curl -Lo php-fpm-healthcheck.tgz "https://github.com/renatomefi/php-fpm-healthcheck/archive/refs/tags/v$FPM_HEALTHCHECK_VERSION.tar.gz" \
+    && mv "UNIT3D-Community-Edition-${UNIT3D_VERSION}" unit3d \
+    && curl -Lo php-fpm-healthcheck.tgz "https://github.com/renatomefi/php-fpm-healthcheck/archive/refs/tags/v${FPM_HEALTHCHECK_VERSION}.tar.gz" \
     && tar -xzf php-fpm-healthcheck.tgz \
     && rm php-fpm-healthcheck.tgz \
-    && mv "php-fpm-healthcheck-$FPM_HEALTHCHECK_VERSION/php-fpm-healthcheck" /usr/bin/ \
-    && rm -r "php-fpm-healthcheck-$FPM_HEALTHCHECK_VERSION" \
+    && mv "php-fpm-healthcheck-${FPM_HEALTHCHECK_VERSION}/php-fpm-healthcheck" /usr/bin/ \
+    && rm -r "php-fpm-healthcheck-${FPM_HEALTHCHECK_VERSION}" \
     && mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini \
     && apt-get clean
 
