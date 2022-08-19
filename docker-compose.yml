@@ -11,14 +11,20 @@ services:
         - "PHP_FPM_VERSION=${php_fpm_version}"
         - "UNIT3D_VERSION=${unit3d_version}"
         - "FPM_HEALTHCHECK_VERSION=${fpm_healthcheck_version}"
+    volumes:
+      - unit3d-app:/var/www
   proxy:
     image: nginx:mainline-alpine
     ports:
       - "${proxy_listen_address}:80"
     volumes:
       - ./unit3d.conf:/etc/nginx/conf.d/default.conf
+      - unit3d-app:/var/www
     networks:
       - unit3d
+
+volumes:
+  unit3d-app:
 
 networks:
   unit3d:
