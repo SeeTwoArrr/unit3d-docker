@@ -12,7 +12,7 @@ ENV FPM_HEALTHCHECK_VERSION=${FPM_HEALTHCHECK_VERSION}
 WORKDIR /var/www
 
 RUN apt-get update \
-    && apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev sensible-utils ucf libicu-dev icu-devtools \
+    && apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev sensible-utils ucf libicu-dev icu-devtools fcgiwrap \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && printf '\n' | pecl install redis-5.3.7 \
     && docker-php-ext-install -j$(nproc) gd intl bcmath \
@@ -29,13 +29,14 @@ RUN apt-get update \
     && mv "php-fpm-healthcheck-${FPM_HEALTHCHECK_VERSION}/php-fpm-healthcheck" /usr/bin/ \
     && rm -r "php-fpm-healthcheck-${FPM_HEALTHCHECK_VERSION}" \
     && mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini \
-    && apt-get clean
+    && apt-get clean \
+    && echo "pm.status_path = /status" >> /usr/local/etc/php-fpm.d/zz-docker.conf
 
 # https://github.com/renatomefi/php-fpm-healthcheck
-# Perform a healthcheck every 10 seconds, for each one, fpm has 5 seconds to respond.
-# After 6 consecutive failures (1 minute of being unresponsive/too slow) the container becomes unhealthy.
-HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=6 \
-    CMD /usr/bin/php-fpm-healthcheck
+# Perform a healthcheck every 5 seconds, for each one, fpm has 2 seconds to respond.
+# After 6 consecutive failures (30 seconds of being unresponsive/too slow) the container becomes unhealthy.
+HEALTHCHECK --interval=5s --timeout=2s --start-period=5s --retries=6 \
+    CMD /usr/bin/php-fpm-healthcheck || exit 1
 
 VOLUME /var/www/unit3d
 VOLUME /usr/local/etc/php/conf.d
